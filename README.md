@@ -2,6 +2,8 @@
 
 Welcome to the **House Price Predictor** project! This is a real-world, end-to-end MLOps use case designed to help you master the art of building and operationalizing machine learning pipelines.
 
+*Last updated: October 29, 2025 - 6:45 PM (noreply test)*
+
 You'll start from raw data and move through data preprocessing, feature engineering, experimentation, model tracking with MLflow, and optionally using Jupyter for exploration – all while applying industry-grade tooling.
 
 > 🚀 **Want to master MLOps from scratch?**  

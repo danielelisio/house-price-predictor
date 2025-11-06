@@ -1,0 +1,150 @@
+# Git Commands for GitHub Push Workflow
+# Save this file for quick reference!
+
+## Daily Git Workflow (for Green Squares! 🟩)
+
+# 1. Check what changed
+git status
+
+# 2. Stage all changes 
+git add .
+
+# 3. Commit with descriptive message
+git commit -m "Your descriptive commit message here"
+
+# 4. Push to GitHub
+git push origin main
+
+## Useful Troubleshooting Commands
+
+# Check your git configuration
+git config --list | findstr user
+
+# View recent commits
+git log --oneline -5
+
+# Check remote repository URL
+git remote -v
+
+# View detailed commit info
+git log -1 --pretty=format:"%H%n%an <%ae>%n%ad%n%s" --date=iso
+
+# Check if branch is up to date
+git status
+
+## Example Commit Messages (be descriptive!)
+# git commit -m "Add data preprocessing pipeline"
+# git commit -m "Update model experimentation notebook"
+# git commit -m "Fix data cleaning bugs and add validation"
+# git commit -m "Complete feature engineering with RFE selection"
+# git commit -m "Add MLflow experiment tracking"
+
+## Clean Directory Tree (Like Your Instructor)
+# To show only directories without .venv, __pycache__, etc.
+
+# Option 1: Enhanced project overview with actual contents
+function Show-ProjectStructure {
+    Write-Host "house-price-predictor/" -ForegroundColor Yellow
+    
+    # Show configs folder
+    Write-Host "├── configs/" -ForegroundColor Cyan
+    if (Test-Path "configs") {
+        Get-ChildItem "configs" | ForEach-Object { Write-Host "│   ├── $($_.Name)" }
+    }
+    
+    # Show data folder
+    Write-Host "├── data/" -ForegroundColor Cyan
+    if (Test-Path "data") {
+        Get-ChildItem "data" -Directory | ForEach-Object { 
+            Write-Host "│   ├── $($_.Name)/"
+            Get-ChildItem $_.FullName -File | Select-Object -First 3 | ForEach-Object {
+                Write-Host "│   │   ├── $($_.Name)"
+            }
+        }
+    }
+    
+    # Show deployment folder
+    Write-Host "├── deployment/" -ForegroundColor Cyan
+    if (Test-Path "deployment") {
+        Get-ChildItem "deployment" -Directory | ForEach-Object { 
+            Write-Host "│   └── $($_.Name)/"
+            Get-ChildItem $_.FullName -File | ForEach-Object {
+                Write-Host "│       └── $($_.Name)"
+            }
+        }
+    }
+    
+    # Show models folder
+    Write-Host "├── models/" -ForegroundColor Cyan
+    if (Test-Path "models") {
+        Get-ChildItem "models" -Directory | ForEach-Object { 
+            Write-Host "│   └── $($_.Name)/"
+            Get-ChildItem $_.FullName -File | ForEach-Object {
+                Write-Host "│       └── $($_.Name)"
+            }
+        }
+    }
+    
+    # Show notebooks folder with all notebooks
+    Write-Host "├── notebooks/" -ForegroundColor Cyan
+    if (Test-Path "notebooks") {
+        Get-ChildItem "notebooks" -File -Filter "*.ipynb" | ForEach-Object { 
+            Write-Host "│   ├── $($_.Name)"
+        }
+    }
+    
+    # Show src folder with subfolders and key files
+    Write-Host "├── src/" -ForegroundColor Cyan
+    if (Test-Path "src") {
+        Get-ChildItem "src" -Directory | ForEach-Object { 
+            Write-Host "│   ├── $($_.Name)/"
+            Get-ChildItem $_.FullName -File -Filter "*.py" | ForEach-Object {
+                Write-Host "│   │   └── $($_.Name)"
+            }
+        }
+    }
+    
+    # Show root files
+    Write-Host "├── requirements.txt" -ForegroundColor Green
+    Write-Host "├── git-commands.txt" -ForegroundColor Green
+    Write-Host "└── README.md" -ForegroundColor Green
+}
+
+# Option 2: Unix-style tree equivalent (instructor style)
+function Show-Tree {
+    param(
+        [string]$Path = ".",
+        [string[]]$Exclude = @(".venv", "__pycache__", ".git", "node_modules", ".ipynb_checkpoints")
+    )
+    
+    function Show-Directory($dir, $prefix = "", $isLast = $true) {
+        $items = Get-ChildItem $dir | Where-Object { 
+            $exclude -notcontains $_.Name 
+        } | Sort-Object Name
+        
+        for ($i = 0; $i -lt $items.Count; $i++) {
+            $item = $items[$i]
+            $isLastItem = ($i -eq ($items.Count - 1))
+            $connector = if ($isLastItem) { "└── " } else { "├── " }
+            
+            Write-Host "$prefix$connector$($item.Name)" -ForegroundColor $(if ($item.PSIsContainer) { "Cyan" } else { "White" })
+            
+            if ($item.PSIsContainer) {
+                $newPrefix = $prefix + $(if ($isLastItem) { "    " } else { "│   " })
+                Show-Directory $item.FullName $newPrefix $isLastItem
+            }
+        }
+    }
+    
+    Write-Host (Split-Path $Path -Leaf) -ForegroundColor Yellow
+    Show-Directory $Path
+}
+
+# Usage: Show-ProjectStructure  (instructor style)
+
+## Pro Tips:
+# - Commit often (daily for green squares)
+# - Use descriptive commit messages
+# - Push regularly to backup your work
+# - Check github.com/danielelisio for green squares after pushing
+# - Use Show-ProjectStructure for clean project overview

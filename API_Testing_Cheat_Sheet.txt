@@ -1,0 +1,317 @@
+# FastAPI Endpoint Testing Cheat Sheet
+# House Price Prediction API - Testing Guide
+# ===========================================
+
+## Current Setup Status
+# Docker Compose Services:
+# - FastAPI (house-price-predictor-fastapi-1): http://127.0.0.1:8000
+# - Streamlit (house-price-predictor-streamlit-1): http://127.0.0.1:8501
+# 
+# Legacy Individual Container:
+# - FastAPI (dazzling_bartik): http://127.0.0.1:8080
+
+## Container Status Commands
+# Check running containers
+docker ps
+
+# Check docker-compose services
+docker compose ps
+
+# Check container logs
+docker logs <container_id>
+docker logs --tail 20 <container_id>
+
+# Check docker-compose logs
+docker compose logs fastapi
+docker compose logs --tail 20 fastapi
+
+# Access container shell
+docker exec -it <container_id> /bin/bash
+docker compose exec fastapi /bin/bash
+
+## Available Endpoints
+# Docker-Compose FastAPI: http://127.0.0.1:8000 (RECOMMENDED)
+# Legacy Container: http://127.0.0.1:8080 (cbadaaa41e51/dazzling_bartik)
+# 
+# 1. Health Check: GET /health
+# 2. Single Prediction: POST /predict
+# 3. Batch Prediction: POST /batch-predict
+
+## Testing Methods
+
+### Method 1A: Direct Commands from PC (Easiest - Recommended)
+# Run single commands from your PC terminal to execute inside container
+# Current Container: cbadaaa41e51
+
+# Health check test
+docker exec cbadaaa41e51 python -c "import urllib.request; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+
+# Single prediction test
+docker exec cbadaaa41e51 python -c "import urllib.request; import json; data = {'sqft': 2000, 'bedrooms': 3, 'bathrooms': 2.5, 'location': 'suburban', 'year_built': 2010, 'condition': 'Good'}; req = urllib.request.Request('http://localhost:8000/predict', data=json.dumps(data).encode(), headers={'Content-Type': 'application/json'}); response = urllib.request.urlopen(req); print(response.read().decode())"
+
+### Method 1B: Interactive Docker Shell (Two Steps)
+# Step 1: Open interactive shell inside container (from PC terminal)
+docker exec -it cbadaaa41e51 /bin/bash
+# Note: Use 'sh' instead of '/bin/bash' if you get path errors in Git Bash
+
+# Step 2: Once inside container, run these commands one by one:
+python -c "import urllib.request; import json; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+
+python -c "
+import urllib.request
+import json
+data = {
+    'sqft': 2000, 
+    'bedrooms': 3, 
+    'bathrooms': 2.5, 
+    'location': 'suburban', 
+    'year_built': 2010, 
+    'condition': 'Good'
+}
+req = urllib.request.Request(
+    'http://localhost:8000/predict', 
+    data=json.dumps(data).encode(), 
+    headers={'Content-Type': 'application/json'}
+)
+response = urllib.request.urlopen(req)
+print(response.read().decode())
+"
+
+# Step 3: Exit container shell
+exit
+
+### Method 2: From Host Machine (Docker-Compose Services)
+# Using Python requests - WORKS with docker-compose
+python -c "
+import requests
+import json
+
+# Health check (docker-compose FastAPI)
+print('Health Check:')
+response = requests.get('http://127.0.0.1:8000/health')
+print(f'Status: {response.status_code}')
+print(f'Response: {response.json()}')
+
+# Single prediction
+print('\nSingle Prediction:')
+data = {
+    'sqft': 2000,
+    'bedrooms': 3,
+    'bathrooms': 2.5,
+    'location': 'suburban',
+    'year_built': 2010,
+    'condition': 'Good'
+}
+response = requests.post('http://127.0.0.1:8000/predict', json=data)
+print(f'Status: {response.status_code}')
+print(f'Response: {response.json()}')
+"
+
+### Method 3: Using PowerShell (Windows)
+# Health check (docker-compose)
+Invoke-WebRequest -Uri "http://127.0.0.1:8000/health" -Method GET
+
+# Health check (legacy container)
+Invoke-WebRequest -Uri "http://127.0.0.1:8080/health" -Method GET
+
+# Prediction (docker-compose)
+$body = @{
+    sqft = 2000
+    bedrooms = 3
+    bathrooms = 2.5
+    location = "suburban"
+    year_built = 2010
+    condition = "Good"
+} | ConvertTo-Json
+
+Invoke-WebRequest -Uri "http://127.0.0.1:8000/predict" -Method POST -Body $body -ContentType "application/json"
+
+### Method 4: Using curl (if available)
+# Health check (docker-compose)
+curl http://127.0.0.1:8000/health
+
+# Health check (legacy container)
+curl http://127.0.0.1:8080/health
+
+# Single prediction (docker-compose)
+curl -X POST "http://127.0.0.1:8000/predict" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "sqft": 2000,
+       "bedrooms": 3,
+       "bathrooms": 2.5,
+       "location": "suburban",
+       "year_built": 2010,
+       "condition": "Good"
+     }'
+
+# Single prediction (legacy container)
+curl -X POST "http://127.0.0.1:8080/predict" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "sqft": 2000,
+       "bedrooms": 3,
+       "bathrooms": 2.5,
+       "location": "suburban",
+       "year_built": 2010,
+       "condition": "Good"
+     }'
+
+## Sample Data for Testing
+
+### Single House Prediction Request
+{
+  "sqft": 2000,
+  "bedrooms": 3,
+  "bathrooms": 2.5,
+  "location": "suburban",
+  "year_built": 2010,
+  "condition": "Good"
+}
+
+### Batch Prediction Request
+[
+  {
+    "sqft": 2000,
+    "bedrooms": 3,
+    "bathrooms": 2.5,
+    "location": "suburban",
+    "year_built": 2010,
+    "condition": "Good"
+  },
+  {
+    "sqft": 1500,
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "location": "urban",
+    "year_built": 2015,
+    "condition": "Excellent"
+  }
+]
+
+## Expected Responses
+
+### Health Check Response
+{
+  "status": "healthy",
+  "model_loaded": true
+}
+
+### Prediction Response
+{
+  "predicted_price": 541305.99,
+  "confidence_interval": [487175.39, 595436.59],
+  "features_importance": {},
+  "prediction_time": "2025-10-31T20:18:13.333639"
+}
+
+## Valid Field Values
+
+### location options:
+- "urban"
+- "suburban" 
+- "rural"
+
+### condition options:
+- "Poor"
+- "Fair"
+- "Good"
+- "Excellent"
+
+### Field constraints:
+- sqft: must be > 0
+- bedrooms: must be >= 1
+- bathrooms: must be > 0
+- year_built: must be between 1800 and 2023
+
+## Browser Testing URLs (Copy-Paste Ready)
+
+### Docker-Compose Services (RECOMMENDED)
+# Interactive API Documentation - Swagger UI
+http://127.0.0.1:8000/docs
+
+# Alternative Documentation - ReDoc  
+http://127.0.0.1:8000/redoc
+
+# Simple Health Check (GET request)
+http://127.0.0.1:8000/health
+
+# Streamlit Web Interface
+http://127.0.0.1:8501
+
+### Legacy Individual Container
+# Interactive API Documentation - Swagger UI
+http://127.0.0.1:8080/docs
+
+# Alternative Documentation - ReDoc  
+http://127.0.0.1:8080/redoc
+
+# Simple Health Check (GET request)
+http://127.0.0.1:8080/health
+
+# Note: Use 127.0.0.1 instead of localhost for Windows Docker compatibility
+
+## Troubleshooting
+
+### Container not responding:
+1. Check if container is running: docker ps
+2. Check container logs: docker logs <container_id>
+3. Restart container if needed: docker restart <container_id>
+
+### Connection refused from host:
+1. Test from inside container first
+2. Check Windows firewall settings
+3. Try different ports or container restart
+
+### Model loading errors:
+1. Check scikit-learn version warnings in logs
+2. Verify model files exist in container:
+   docker exec <container_id> ls -la /app/models/trained/
+
+## Quick Test Commands (Copy-Paste Ready)
+
+# ==== DOCKER-COMPOSE TESTING (RECOMMENDED) ====
+# Services: house-price-predictor-fastapi-1, house-price-predictor-streamlit-1
+
+# 1. Health check (from host)
+curl http://127.0.0.1:8000/health
+
+# 2. Single prediction (from host)
+curl -X POST "http://127.0.0.1:8000/predict" -H "Content-Type: application/json" -d '{"sqft": 2000, "bedrooms": 3, "bathrooms": 2.5, "location": "suburban", "year_built": 2010, "condition": "Good"}'
+
+# 3. Interactive shell
+docker compose exec fastapi /bin/bash
+
+# 4. Inside container commands:
+# python -c "import urllib.request; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+
+# ==== LEGACY CONTAINER TESTING ====
+# Container: cbadaaa41e51/dazzling_bartik, Port: 8080 (host) -> 8000 (container)
+
+# 1. Health check
+docker exec dazzling_bartik python -c "import urllib.request; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+
+# 2. Single prediction
+docker exec dazzling_bartik python -c "import urllib.request; import json; data = {'sqft': 2000, 'bedrooms': 3, 'bathrooms': 2.5, 'location': 'suburban', 'year_built': 2010, 'condition': 'Good'}; req = urllib.request.Request('http://localhost:8000/predict', data=json.dumps(data).encode(), headers={'Content-Type': 'application/json'}); response = urllib.request.urlopen(req); print(response.read().decode())"
+
+# ==== CONTAINER MANAGEMENT ====
+# Check all containers
+docker ps
+
+# Check docker-compose services
+docker compose ps
+
+# View recent logs (docker-compose)
+docker compose logs --tail 10 fastapi
+docker compose logs --tail 10 streamlit
+
+# View recent logs (legacy)
+docker logs --tail 10 dazzling_bartik
+
+# Stop/Start services
+docker compose stop
+docker compose start
+docker compose restart fastapi
+
+# Stop legacy container
+docker stop dazzling_bartik

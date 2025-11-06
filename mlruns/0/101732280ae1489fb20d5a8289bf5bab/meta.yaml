@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/0/101732280ae1489fb20d5a8289bf5bab/artifacts
+end_time: 1761938092774
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 101732280ae1489fb20d5a8289bf5bab
+run_name: final_training
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761938084989
+status: 4
+tags: []
+user_id: danie

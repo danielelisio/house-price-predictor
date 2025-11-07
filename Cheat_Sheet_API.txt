@@ -2,6 +2,12 @@
 # House Price Prediction API - Testing Guide
 # ===========================================
 
+## ✅ WORKING ENDPOINTS (Quick Access)
+# Streamlit UI: http://127.0.0.1:8501
+# FastAPI Swagger: http://127.0.0.1:8000/docs
+# Health Check: http://127.0.0.1:8000/health
+# Prediction API: http://127.0.0.1:8000/predict
+
 ## Current Setup Status
 # Docker Compose Services:
 # - FastAPI (house-price-predictor-fastapi-1): http://127.0.0.1:8000
@@ -44,10 +50,10 @@ docker compose exec fastapi /bin/bash
 # Current Container: cbadaaa41e51
 
 # Health check test
-docker exec cbadaaa41e51 python -c "import urllib.request; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+docker exec cbadaaa41e51 python -c "import urllib.request; response = urllib.request.urlopen('http://127.0.0.1:8000/health'); print(response.read().decode())"
 
 # Single prediction test
-docker exec cbadaaa41e51 python -c "import urllib.request; import json; data = {'sqft': 2000, 'bedrooms': 3, 'bathrooms': 2.5, 'location': 'suburban', 'year_built': 2010, 'condition': 'Good'}; req = urllib.request.Request('http://localhost:8000/predict', data=json.dumps(data).encode(), headers={'Content-Type': 'application/json'}); response = urllib.request.urlopen(req); print(response.read().decode())"
+docker exec cbadaaa41e51 python -c "import urllib.request; import json; data = {'sqft': 2000, 'bedrooms': 3, 'bathrooms': 2.5, 'location': 'suburban', 'year_built': 2010, 'condition': 'Good'}; req = urllib.request.Request('http://127.0.0.1:8000/predict', data=json.dumps(data).encode(), headers={'Content-Type': 'application/json'}); response = urllib.request.urlopen(req); print(response.read().decode())"
 
 ### Method 1B: Interactive Docker Shell (Two Steps)
 # Step 1: Open interactive shell inside container (from PC terminal)
@@ -55,7 +61,7 @@ docker exec -it cbadaaa41e51 /bin/bash
 # Note: Use 'sh' instead of '/bin/bash' if you get path errors in Git Bash
 
 # Step 2: Once inside container, run these commands one by one:
-python -c "import urllib.request; import json; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+python -c "import urllib.request; import json; response = urllib.request.urlopen('http://127.0.0.1:8000/health'); print(response.read().decode())"
 
 python -c "
 import urllib.request
@@ -69,7 +75,7 @@ data = {
     'condition': 'Good'
 }
 req = urllib.request.Request(
-    'http://localhost:8000/predict', 
+    'http://127.0.0.1:8000/predict', 
     data=json.dumps(data).encode(), 
     headers={'Content-Type': 'application/json'}
 )
@@ -289,10 +295,10 @@ docker compose exec fastapi /bin/bash
 # Container: cbadaaa41e51/dazzling_bartik, Port: 8080 (host) -> 8000 (container)
 
 # 1. Health check
-docker exec dazzling_bartik python -c "import urllib.request; response = urllib.request.urlopen('http://localhost:8000/health'); print(response.read().decode())"
+docker exec dazzling_bartik python -c "import urllib.request; response = urllib.request.urlopen('http://127.0.0.1:8000/health'); print(response.read().decode())"
 
 # 2. Single prediction
-docker exec dazzling_bartik python -c "import urllib.request; import json; data = {'sqft': 2000, 'bedrooms': 3, 'bathrooms': 2.5, 'location': 'suburban', 'year_built': 2010, 'condition': 'Good'}; req = urllib.request.Request('http://localhost:8000/predict', data=json.dumps(data).encode(), headers={'Content-Type': 'application/json'}); response = urllib.request.urlopen(req); print(response.read().decode())"
+docker exec dazzling_bartik python -c "import urllib.request; import json; data = {'sqft': 2000, 'bedrooms': 3, 'bathrooms': 2.5, 'location': 'suburban', 'year_built': 2010, 'condition': 'Good'}; req = urllib.request.Request('http://127.0.0.1:8000/predict', data=json.dumps(data).encode(), headers={'Content-Type': 'application/json'}); response = urllib.request.urlopen(req); print(response.read().decode())"
 
 # ==== CONTAINER MANAGEMENT ====
 # Check all containers

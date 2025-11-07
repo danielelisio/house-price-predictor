@@ -150,7 +150,7 @@ Once you have launched both the apps, you should be able to access streamlit web
 You could also test predictions with FastAPI directly using 
 
 ```
-curl -X POST "http://localhost:8000/predict" \
+curl -X POST "http://127.0.0.1:8000/predict" \
 -H "Content-Type: application/json" \
 -d '{
   "sqft": 1500,
@@ -163,7 +163,7 @@ curl -X POST "http://localhost:8000/predict" \
 
 ```
 
-Be sure to replace `http://localhost:8000/predict` with actual endpoint based on where its running. 
+Be sure to replace `http://127.0.0.1:8000/predict` with actual endpoint based on where its running. 
 
 
 ## 🧠 Learn More About MLOps

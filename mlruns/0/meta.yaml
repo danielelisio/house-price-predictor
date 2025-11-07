@@ -1,6 +1,6 @@
-artifact_location: mlflow-artifacts:/0
-creation_time: 1761758097775
+artifact_location: file:///C:/Documents_Local/SchoolOfDevOps/MLOps_Course/house-price-predictor/mlruns/0
+creation_time: 1762483966560
 experiment_id: '0'
-last_update_time: 1761758097775
+last_update_time: 1762483966560
 lifecycle_stage: active
 name: Default

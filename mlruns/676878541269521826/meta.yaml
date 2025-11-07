@@ -1,0 +1,6 @@
+artifact_location: file:///C:/Documents_Local/SchoolOfDevOps/MLOps_Course/house-price-predictor/mlruns/676878541269521826
+creation_time: 1762483966581
+experiment_id: '676878541269521826'
+last_update_time: 1762483966581
+lifecycle_stage: active
+name: house_price_model

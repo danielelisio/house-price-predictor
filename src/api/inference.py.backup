@@ -1,84 +1,33 @@
 import joblib
 import pandas as pd
-import numpy as np
 from datetime import datetime
 from schemas import HousePredictionRequest, PredictionResponse
 
-# Load model
+# Load model and preprocessor
 MODEL_PATH = "models/trained/house_price_model.pkl"
+PREPROCESSOR_PATH = "models/trained/preprocessor.pkl"
 
 try:
     model = joblib.load(MODEL_PATH)
-    print("✅ Model loaded successfully")
+    preprocessor = joblib.load(PREPROCESSOR_PATH)
 except Exception as e:
-    print(f"❌ Error loading model: {e}")
-    model = None
+    raise RuntimeError(f"Error loading model or preprocessor: {str(e)}")
 
 def predict_price(request: HousePredictionRequest) -> PredictionResponse:
     """
     Predict house price based on input features.
     """
-    if model is None:
-        raise RuntimeError("Model not loaded. Cannot make predictions.")
-    
-    # Calculate engineered features
-    house_age = datetime.now().year - request.year_built
-    bed_bath_ratio = request.bedrooms / request.bathrooms if request.bathrooms > 0 else 0
-    price_per_sqft = 0  # Dummy value as it was during training
-    
-    # Create the feature array in the exact order the model expects
-    # Based on the training data analysis, we need to create a 16-feature array
-    # The exact mapping needs to be determined, but we'll create a reasonable approximation
-    
-    # Numerical features first (based on the feature engineering)
-    numerical_features = [
-        request.sqft,        # 0: sqft
-        request.bedrooms,    # 1: bedrooms  
-        request.bathrooms,   # 2: bathrooms
-        house_age,           # 3: house_age
-        price_per_sqft,      # 4: price_per_sqft  
-        bed_bath_ratio       # 5: bed_bath_ratio
-    ]
-    
-    # One-hot encoded categorical features (location and condition)
-    # Based on training data, we need to handle: location (urban, suburban, rural, etc.) and condition
-    location_features = [0] * 5  # Assuming 5 location categories in one-hot encoding
-    condition_features = [0] * 5  # Assuming 5 condition categories in one-hot encoding
-    
-    # Simple mapping for location (this should match the training data categories)
-    location_lower = request.location.lower()
-    if 'urban' in location_lower:
-        location_features[0] = 1
-    elif 'suburb' in location_lower:
-        location_features[1] = 1  
-    elif 'rural' in location_lower:
-        location_features[2] = 1
-    elif 'downtown' in location_lower:
-        location_features[3] = 1
-    elif 'waterfront' in location_lower:
-        location_features[4] = 1
-    
-    # Simple mapping for condition
-    condition_lower = request.condition.lower()
-    if 'excellent' in condition_lower:
-        condition_features[0] = 1
-    elif 'good' in condition_lower:
-        condition_features[1] = 1
-    elif 'fair' in condition_lower:
-        condition_features[2] = 1
-    elif 'poor' in condition_lower:
-        condition_features[3] = 1
-    else:
-        condition_features[4] = 1  # Default/other
-    
-    # Combine all features into a single array (should total 16 features)
-    feature_array = numerical_features + location_features + condition_features
-    
-    # Convert to numpy array and reshape for prediction
-    feature_array = np.array(feature_array).reshape(1, -1)
-    
-    # Make prediction directly (no preprocessing needed since we've manually created the feature array)
-    predicted_price = model.predict(feature_array)[0]
+    # Prepare input data
+    input_data = pd.DataFrame([request.dict()])
+    input_data['house_age'] = datetime.now().year - input_data['year_built']
+    input_data['bed_bath_ratio'] = input_data['bedrooms'] / input_data['bathrooms']
+    input_data['price_per_sqft'] = 0  # Dummy value for compatibility
+
+    # Preprocess input data
+    processed_features = preprocessor.transform(input_data)
+
+    # Make prediction
+    predicted_price = model.predict(processed_features)[0]
 
     # Convert numpy.float32 to Python float and round to 2 decimal places
     predicted_price = round(float(predicted_price), 2)

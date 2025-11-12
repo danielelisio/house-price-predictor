@@ -1,5 +1,5 @@
 # .github/workflows/mlops-pipeline.yml
-name: MLOps Pipeline
+name: MLOps Pipeline (Old Version)
 
 on:
   workflow_dispatch: {} # Enables manual trigger from GitHub UI

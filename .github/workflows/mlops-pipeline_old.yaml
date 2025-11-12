@@ -1,28 +1,8 @@
+# .github/workflows/mlops-pipeline.yml
 name: MLOps Pipeline
 
 on:
-  workflow_dispatch:
-    inputs:
-      run_all:
-        description: 'Set to true to run the full pipeline'
-        required: false
-        default: 'true'
-      run_data_processing:
-        description: 'Run data processing job'
-        required: false
-        default: 'false'
-      run_model_training:
-        description: 'Run model training job'
-        required: false
-        default: 'false'
-      run_build_and_publish:
-        description: 'Run build and publish job'
-        required: false
-        default: 'false'
-  release:
-    types: [created]
-    branches: [ main ]
-    tags: [ 'v*.*.*' ]
+  workflow_dispatch: {} # Enables manual trigger from GitHub UI
 
 jobs:
   data-processing:
@@ -69,7 +49,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-       
+      
     - name: Set up Python
       uses: actions/setup-python@v2
       with:

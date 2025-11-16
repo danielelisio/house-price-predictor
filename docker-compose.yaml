@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8002:8000"
 
   streamlit:
     image: mlspecialist99/streamlit:dev
@@ -16,6 +16,7 @@ services:
       - "8501:8501"
     environment:
       API_URL: http://fastapi:8000
+      APP_VERSION: 4.0.0
 
 
 

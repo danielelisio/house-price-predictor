@@ -1,0 +1,33 @@
+# App Startup Cheat Sheet
+
+## 🟢 Start the App (build and run in background)
+```
+docker-compose up -d --build
+```
+- Rebuilds images and starts all services in the background.
+
+## 🟢 Start the App (if no code changes)
+```
+docker-compose up -d
+```
+- Starts services in the background using existing images.
+
+## 🛑 Stop the App
+```
+docker-compose down
+```
+- Stops and removes all running containers.
+
+## 🧹 View Logs
+```
+docker-compose logs -f
+```
+- Shows real-time logs for all services.
+
+## 🌐 Access the App
+- Streamlit UI: http://localhost:8501
+- FastAPI docs: http://localhost:8002
+
+## 🧑‍💻 Common Troubleshooting
+- If you get a port conflict, make sure no other app is using the same port.
+- If you change code, always use `--build` to rebuild images.

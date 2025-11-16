@@ -1,0 +1,10 @@
+v
+ 
+
+kubectl create service nodeport streamlit --tcp=8501 --node-port=30000 -o yaml --dry-run=client > streamlit-svc.yaml
+
+kubectl create deployment streamlit --image=mlspecialist99/streamlit:v5 --port=8501 --replicas=2 --dry-run=client -o yaml > streamlit-deploy.yaml
+
+kubectl create service nodeport model --tcp=8000 --node-port=30100 --dry-run=client -o yaml > model-svc.yaml
+
+kubectl create deployment model --image=mlspecialist99/house-price-model:latest --port=8000 --replicas=2 --dry-run=client -o yaml > model-deploy.yaml

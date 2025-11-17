@@ -18,7 +18,7 @@ spec:
         app: model
     spec:
       containers:
-      - image: mlspecialist99/house-price-model:latest
+      - image: mlspecialist99/house-price-model:fixed
         name: house-price-model
         ports:
         - containerPort: 8000

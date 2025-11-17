@@ -18,7 +18,7 @@ spec:
         app: streamlit
     spec:
       containers:
-      - image: mlspecialist99/streamlit:v5
+      - image: mlspecialist99/streamlit:v4
         name: streamlit
         ports:
         - containerPort: 8501
